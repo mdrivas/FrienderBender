@@ -10,8 +10,8 @@ import { AuthProvider } from "./components/AuthProvider";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Podivate",
-  description: "Podcast creation made easy",
+  title: "FrienderBender",
+  description: "Find new friends. Go on mystery adventures. Your next connection starts in a FrienderBender.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -20,13 +20,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
+      <body className="min-h-screen bg-gradient-to-br from-cream to-pink-50">
         <AuthProvider>
           <Toaster />
           <TRPCReactProvider>
             <Suspense>
               <NavigationBar />
-              {children}
+              <main className="min-h-[calc(100vh-4rem)]">
+                {children}
+              </main>
             </Suspense>
           </TRPCReactProvider>
         </AuthProvider>

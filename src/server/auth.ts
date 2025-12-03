@@ -5,8 +5,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import DiscordProvider from "next-auth/providers/discord";
-import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -15,7 +14,9 @@ import {
   sessions,
   users,
   verificationTokens,
+  profiles,
 } from "~/server/db/schema";
+import { getDefaultAvatar } from "~/lib/avatar";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -59,23 +60,42 @@ export const authOptions: NextAuthOptions = {
     verificationTokensTable: verificationTokens,
   }) as Adapter,
   providers: [
-    GithubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? [GoogleProvider({
+          clientId: env.GOOGLE_CLIENT_ID,
+          clientSecret: env.GOOGLE_CLIENT_SECRET,
+        }),
+      ]
+    : []),
   ],
+  events: {
+    createUser: async ({ user }) => {
+      // Create a profile for new users - always use default avatar
+      if (user.id) {
+        await db.insert(profiles).values({
+          id: user.id,
+          quizCompleted: false,
+          avatarUrl: getDefaultAvatar(),
+        }).onConflictDoNothing();
+      }
+    },
+    signIn: async ({ user }) => {
+      // Ensure profile exists on every sign in - always use default avatar for new profiles
+      if (user.id) {
+        await db.insert(profiles).values({
+          id: user.id,
+          quizCompleted: false,
+          avatarUrl: getDefaultAvatar(),
+        }).onConflictDoNothing();
+      }
+    },
+  },
   session: {
     strategy: "database",
     maxAge: 7 * 24 * 60 * 60, // 7 days
+  },
+  pages: {
+    signIn: "/auth/signin",
   },
 };
 

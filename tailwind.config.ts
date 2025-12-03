@@ -54,7 +54,13 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+  			// FrienderBender custom colors
+  			coral: '#FF6B6B',
+  			'soft-pink': '#FFD6D6',
+  			'electric-blue': '#4FACF7',
+  			cream: '#FFF7F1',
+  			charcoal: '#2C3E50',
   		}
   	}
   },
