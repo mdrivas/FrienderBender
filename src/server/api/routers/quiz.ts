@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, ne, desc } from "drizzle-orm";
+import { eq, ne, desc, and } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { quizResponses, profiles, users } from "~/server/db/schema";
 import {
@@ -57,6 +57,30 @@ export const quizRouter = createTRPCRouter({
       orderBy: [desc(quizResponses.createdAt)],
     });
     return quiz;
+  }),
+
+  // Delete quiz to redo it
+  deleteQuiz: protectedProcedure.mutation(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    console.log("[deleteQuiz] Deleting quiz for user:", userId);
+
+    // Delete all quiz responses for this user
+    const deleteResult = await ctx.db
+      .delete(quizResponses)
+      .where(eq(quizResponses.userId, userId))
+      .returning();
+
+    console.log("[deleteQuiz] Deleted records:", deleteResult.length);
+
+    // Mark profile as quiz not completed
+    await ctx.db
+      .update(profiles)
+      .set({ quizCompleted: false })
+      .where(eq(profiles.id, userId));
+
+    console.log("[deleteQuiz] Updated profile quizCompleted to false");
+
+    return { success: true, deletedCount: deleteResult.length };
   }),
 
   // Get matches based on quiz compatibility

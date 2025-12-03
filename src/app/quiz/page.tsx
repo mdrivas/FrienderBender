@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
 import { Card } from "~/components/ui/card";
 import { Textarea } from "~/components/ui/textarea";
-import { ArrowRight, ArrowLeft, Sparkles, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Sparkles, Check, RefreshCw, Users } from "lucide-react";
 import { api } from "~/trpc/react";
 import LoadingSkeleton from "~/app/components/LoadingSkeleton";
 
@@ -190,9 +190,21 @@ export default function Quiz() {
     { enabled: status === "authenticated" }
   );
 
+  const utils = api.useUtils();
+
   const submitQuiz = api.quiz.submit.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Invalidate queries so matches page has fresh data
+      await utils.quiz.getMyQuiz.invalidate();
+      await utils.quiz.getMatches.invalidate();
       router.push("/matches");
+    },
+  });
+
+  const deleteQuiz = api.quiz.deleteQuiz.useMutation({
+    onSuccess: () => {
+      // Set the query data to undefined immediately so UI updates without waiting for refetch
+      utils.quiz.getMyQuiz.setData(undefined, undefined);
     },
   });
 
@@ -202,17 +214,62 @@ export default function Quiz() {
     }
   }, [status]);
 
-  // Redirect to matches if quiz already completed
-  useEffect(() => {
-    if (existingQuiz) {
-      router.push("/matches");
-    }
-  }, [existingQuiz, router]);
-
-  if (status === "loading" || status === "unauthenticated" || quizLoading || existingQuiz) {
+  if (status === "loading" || status === "unauthenticated" || quizLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSkeleton message="Checking your vibe..." />
+      </div>
+    );
+  }
+
+  // Show "already completed" state with redo option
+  if (existingQuiz) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-lg"
+        >
+          <Card className="p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-10 h-10 text-green-500" />
+            </div>
+            <h2 className="text-3xl font-bold text-charcoal mb-3">
+              Quiz Already Completed! 🎉
+            </h2>
+            <p className="text-gray-600 mb-8">
+              You&apos;ve already taken the friendship quiz. Check out your matches or retake the quiz to update your preferences.
+            </p>
+            <div className="space-y-3">
+              <Button
+                onClick={() => router.push("/matches")}
+                className="w-full bg-coral hover:bg-coral/90 text-white rounded-full py-6 text-lg"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                View My Matches
+              </Button>
+              <Button
+                onClick={() => deleteQuiz.mutate()}
+                disabled={deleteQuiz.isPending}
+                variant="outline"
+                className="w-full rounded-full py-6 text-lg border-2 border-gray-300 hover:border-coral hover:text-coral"
+              >
+                {deleteQuiz.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-coral mr-2" />
+                    Resetting...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-2" />
+                    Redo Quiz
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </motion.div>
       </div>
     );
   }
