@@ -5,13 +5,21 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession, signIn } from "next-auth/react";
 import { Button } from "~/components/ui/button";
 import { Sparkles, Home, Users, Calendar, LogIn, LogOut } from "lucide-react";
+import { api } from "~/trpc/react";
 import { getUserAvatar } from "~/lib/avatar";
 
 const FALLBACK_AVATAR = "/default-avatar.svg";
 
 export function NavigationBar() {
-  const { status, data: session } = useSession();
+  const { status } = useSession();
   const pathname = usePathname();
+
+  // Fetch profile to get the user's actual avatar
+  const { data: profile } = api.profile.getMyProfile.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
+
+  const avatarUrl = getUserAvatar(profile?.image, profile?.avatarUrl);
 
   const navLinks = [
     { name: "Home", path: "/", icon: Home },
@@ -67,7 +75,7 @@ export function NavigationBar() {
                   }`}
                 >
                   <img
-                    src={getUserAvatar(session?.user?.image)}
+                    src={avatarUrl}
                     alt="Profile"
                     className="w-8 h-8 rounded-full bg-soft-pink"
                     onError={(e) => {
@@ -123,7 +131,7 @@ export function NavigationBar() {
                 }`}
               >
                 <img
-                  src={getUserAvatar(session?.user?.image)}
+                  src={avatarUrl}
                   alt="Profile"
                   className="w-6 h-6 rounded-full bg-soft-pink"
                   onError={(e) => {

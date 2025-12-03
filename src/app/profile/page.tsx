@@ -8,12 +8,13 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import { Skeleton } from "~/components/ui/skeleton";
-import { Sparkles, User, Save } from "lucide-react";
+import { Sparkles, User, Save, Camera } from "lucide-react";
 import { api } from "~/trpc/react";
 import { useSession, signIn } from "next-auth/react";
 import { getUserAvatar } from "~/lib/avatar";
+import { UploadButton } from "~/lib/uploadthing";
 
-const FALLBACK_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23FFD6D6'/%3E%3Ccircle cx='50' cy='38' r='18' fill='%23FF6B6B'/%3E%3Cellipse cx='50' cy='85' rx='30' ry='25' fill='%23FF6B6B'/%3E%3C/svg%3E";
+const FALLBACK_AVATAR = "/default-avatar.svg";
 
 export default function Profile() {
   const { status } = useSession();
@@ -114,19 +115,33 @@ export default function Profile() {
                     e.currentTarget.src = FALLBACK_AVATAR;
                   }}
                 />
-                {!profile?.avatarUrl && !profile?.image && (
-                  <div className="absolute -bottom-2 -right-2 bg-coral text-white text-xs px-2 py-1 rounded-full font-bold">
-                    Your Avatar
-                  </div>
-                )}
+                <div className="absolute -bottom-2 -right-2 bg-coral text-white p-2 rounded-full shadow-lg">
+                  <Camera className="w-4 h-4" />
+                </div>
               </div>
             </div>
 
-            <p className="text-sm text-gray-600">
-              {profile?.avatarUrl || profile?.image
-                ? "Your profile photo from your sign-in account"
-                : "Your unique avatar - generated just for you!"}
+            <p className="text-sm text-gray-600 mb-4">
+              {profile?.avatarUrl && profile.avatarUrl !== "/default-avatar.svg"
+                ? "Your custom profile photo"
+                : "Upload a photo to personalize your profile!"}
             </p>
+
+            <UploadButton
+              endpoint="profileImage"
+              onClientUploadComplete={(res) => {
+                if (res?.[0]?.url) {
+                  updateProfile.mutate({ avatarUrl: res[0].url });
+                }
+              }}
+              onUploadError={(error: Error) => {
+                alert(`Upload failed: ${error.message}`);
+              }}
+              appearance={{
+                button: "bg-coral hover:bg-coral/90 text-white rounded-full px-6 py-2 text-sm font-medium",
+                allowedContent: "text-xs text-gray-500",
+              }}
+            />
           </Card>
         </motion.div>
 

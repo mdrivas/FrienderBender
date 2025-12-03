@@ -4,7 +4,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { Sparkles, Brain, Users, Car, Zap, MapPin, GraduationCap } from "lucide-react";
+import { Sparkles, Brain, Users, Car, Zap, MapPin, GraduationCap, MessageSquare } from "lucide-react";
+
+// Feedback form QR code URL
+const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeGvOqaXZAvLwv0EbIE4TYHbIQ4XTN2PBR32y9IZfAGoDfwRQ/viewform?usp=header";
+const QR_CODE_URL = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(FEEDBACK_FORM_URL)}`;
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -39,6 +43,27 @@ export default function Landing() {
 
   return (
     <div className="overflow-hidden">
+      {/* Feedback QR Code - Fixed top left */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1 }}
+        className="fixed top-20 left-4 z-50 bg-white rounded-xl shadow-lg p-3 border-2 border-coral/20 hover:border-coral transition-colors"
+      >
+        <a href={FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer" className="block">
+          <div className="flex items-center gap-1 mb-2">
+            <MessageSquare className="w-4 h-4 text-coral" />
+            <span className="text-xs font-bold text-charcoal">Feedback</span>
+          </div>
+          <img
+            src={QR_CODE_URL}
+            alt="Scan to give feedback"
+            className="w-24 h-24 rounded"
+          />
+          <p className="text-[10px] text-gray-500 text-center mt-1">Scan to share feedback</p>
+        </a>
+      </motion.div>
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-4 py-20">
         <div className="absolute inset-0 overflow-hidden">
