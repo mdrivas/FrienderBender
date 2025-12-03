@@ -82,7 +82,7 @@ export const messageRouter = createTRPCRouter({
         where: eq(messages.id, input.messageId),
       });
 
-      if (originalMessage && originalMessage.eventId) {
+      if (originalMessage?.eventId) {
         const event = await ctx.db.query.events.findFirst({
           where: eq(events.id, originalMessage.eventId),
         });

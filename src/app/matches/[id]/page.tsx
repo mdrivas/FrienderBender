@@ -56,7 +56,7 @@ const interestData: Record<string, { emoji: string; label: string }> = {
   boardgames: { emoji: "🎲", label: "Board Game Nights" },
 };
 
-const hangoutVibeData: Record<string, { emoji: string; label: string }> = {
+const _hangoutVibeData: Record<string, { emoji: string; label: string }> = {
   active: { emoji: "🏃", label: "Active hangouts" },
   chill: { emoji: "🛋️", label: "Low-key hangs" },
   explore: { emoji: "🏙️", label: "City exploration" },

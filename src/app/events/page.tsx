@@ -167,7 +167,7 @@ export default function Events() {
               <Calendar className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-2xl font-bold text-charcoal mb-2">No events yet</h3>
-            <p className="text-gray-600 mb-6">You haven't signed up for any events. Browse and join one!</p>
+            <p className="text-gray-600 mb-6">You haven&apos;t signed up for any events. Browse and join one!</p>
             <Button
               onClick={() => setFilter("all")}
               className="bg-coral hover:bg-coral/90 text-white rounded-full"
@@ -235,7 +235,7 @@ export default function Events() {
                         className="w-full bg-green-500 hover:bg-green-600 text-white rounded-full"
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
-                        You're Going!
+                        You&apos;re Going!
                       </Button>
                     ) : (
                       <Button
@@ -316,7 +316,7 @@ export default function Events() {
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
                 <CheckCircle className="w-6 h-6 text-green-500" />
                 <div>
-                  <div className="font-bold text-green-700">You're signed up!</div>
+                  <div className="font-bold text-green-700">You&apos;re signed up!</div>
                   <div className="text-sm text-green-600">See you there 🎉</div>
                 </div>
               </div>

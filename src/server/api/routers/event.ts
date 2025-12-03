@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { eq, gte, desc } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { eq, gte } from "drizzle-orm";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { events } from "~/server/db/schema";
 
 // Default events to seed the database

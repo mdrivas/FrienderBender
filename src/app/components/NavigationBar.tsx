@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession, signIn } from "next-auth/react";
 import { Button } from "~/components/ui/button";
 import { Sparkles, Home, Users, Calendar, LogIn, LogOut } from "lucide-react";
-import { getUserAvatar, getDefaultAvatar } from "~/lib/avatar";
+import { getUserAvatar } from "~/lib/avatar";
 
 const FALLBACK_AVATAR = "/default-avatar.svg";
 

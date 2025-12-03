@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Sparkles, Heart, MessageCircle, Calendar, MapPin, X } from "lucide-react";
+import { Sparkles, Heart, MessageCircle, Calendar, MapPin } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Card } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
